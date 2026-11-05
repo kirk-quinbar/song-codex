@@ -5,7 +5,7 @@ import Darklogo from '@/assets/images/logos/logolight.svg';
 <template>
     <div class="logo">
         <RouterLink to="/">
-            <img :src="Darklogo" alt="home" />
+            <img :src="Darklogo" alt="home"/>
         </RouterLink>
     </div>
 </template>

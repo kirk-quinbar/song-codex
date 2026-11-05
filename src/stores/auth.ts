@@ -1,6 +1,13 @@
 import { defineStore } from 'pinia';
 import { router } from '@/router';
 import { fetchWrapper } from '@/utils/helpers/fetch-wrapper';
+import { firebaseAuth } from '@/firebase/config'
+import {
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider, 
+    FacebookAuthProvider
+} from 'firebase/auth'
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
 
@@ -12,6 +19,20 @@ export const useAuthStore = defineStore('auth', {
         returnUrl: null
     }),
     actions: {
+        async loginGoogle() {
+            const provider = new GoogleAuthProvider();
+            provider.addScope('profile');
+            provider.addScope('email');
+
+            return signInWithPopup(firebaseAuth, provider).then((result) => {
+                const user = result.user;
+                console.log('Google sign in successful:', user);
+                return user;
+            });
+        },
+        async loginFacebook() {
+
+        },
         async login(username: string, password: string) {
             const user = await fetchWrapper.post(`${baseUrl}/authenticate`, { username, password });
 

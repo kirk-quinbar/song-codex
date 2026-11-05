@@ -130,7 +130,7 @@ const profileDD: profileType[] = [
     },
     {
         title: 'Sign Out',
-        href: '/auth/login',
+        href: '/auth/login2',
         badge: false
     }
 ];
@@ -243,7 +243,7 @@ const SideProfile: SideProfielType[] = [
         icon: 'login-2-outline',
         color: 'error',
         title: 'Logout',
-        href: '/auth/login'
+        href: '/auth/login2'
     }
 ];
 
@@ -257,7 +257,7 @@ const quickLink: quickLinksType[] = [
     },
     {
         title: 'Authentication Design',
-        href: '/auth/login'
+        href: '/auth/login2'
     },
     {
         title: '404 Error Page',

@@ -76,9 +76,9 @@ const getCart = computed(() => {
         <!-- ---------------------------------------------- -->
         <!-- Mega menu -->
         <!-- ---------------------------------------------- -->
-        <div class="hidden-sm-and-down">
+        <!-- <div class="hidden-sm-and-down">
             <Navigations />
-        </div>
+        </div> -->
 
         <!---/Search part -->
 
@@ -89,9 +89,9 @@ const getCart = computed(() => {
         <!-- ---------------------------------------------- -->
         <!-- translate -->
         <!-- ---------------------------------------------- -->
-        <div class="hidden-sm-and-down">
+        <!-- <div class="hidden-sm-and-down">
             <LanguageDD />
-        </div>
+        </div> -->
 
         <!-- ---------------------------------------------- -->
         <!-- Mobile Logo -->
@@ -106,20 +106,20 @@ const getCart = computed(() => {
         <!-- ---------------------------------------------- -->
         <!-- Notification -->
         <!-- ---------------------------------------------- -->
-        <div class="hidden-sm-and-down">
+        <!-- <div class="hidden-sm-and-down">
             <NotificationDD />
-        </div>
+        </div> -->
         <!-- ---------------------------------------------- -->
         <!-- Messages -->
         <!-- ---------------------------------------------- -->
-        <div class="hidden-sm-and-down">
+        <!-- <div class="hidden-sm-and-down">
             <Messages />
-        </div>
+        </div> -->
 
         <!-- ---------------------------------------------- -->
         <!-- ShoppingCart -->
         <!-- ---------------------------------------------- -->
-        <v-btn
+        <!-- <v-btn
             icon
             variant="text"
             color="primary"
@@ -130,7 +130,7 @@ const getCart = computed(() => {
             <v-badge color="error" :content="getCart?.length">
                 <Icon icon="solar:cart-large-2-outline" height="22" />
             </v-badge>
-        </v-btn>
+        </v-btn> -->
 
         <!-- ---------------------------------------------- -->
         <!-- User Profile -->

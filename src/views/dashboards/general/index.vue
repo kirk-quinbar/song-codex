@@ -13,7 +13,7 @@ import TheWeatherCard from '@/components/dashboards/general/TheWeatherCardVue.vu
 import TheProfileCard from '@/components/dashboards/general/TheProfileCard.vue';
 import TheMyContacts from '@/components/dashboards/general/TheMyContacts.vue';
 import TheActivityTimeline from '@/components/dashboards/general/TheActivityTimeline.vue';
-import SnackBar from '@/components/dashboards/snackbar.vue';
+// import SnackBar from '@/components/dashboards/snackbar.vue';
 const page = ref({ title: 'General' });
 const breadcrumbs = ref([
     {
@@ -31,7 +31,7 @@ const breadcrumbs = ref([
 
 <template>
     <!-- Loader -->
-    <SnackBar />
+    <!-- <SnackBar /> -->
     <!-- Loader -->
 
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
