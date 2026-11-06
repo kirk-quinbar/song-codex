@@ -17,7 +17,7 @@ const password = ref('');
 const username = ref('');
 const passwordRules = ref([
     (v: string) => !!v || 'Password is required',
-    (v: string) => (v && v.length > 8) || 'Password must be greater than 8 characters'
+    (v: string) => (v && v.length >= 8) || 'Password must be greater than 8 characters'
 ]);
 const emailRules = ref([(v: string) => !!v || 'E-mail is required', (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid']);
 
@@ -25,9 +25,9 @@ function signInGoogle() {
     authStore.loginGoogle().catch((error) => console.log(error));
 }
     
-function signInFacebook() {
-    authStore.loginFacebook().catch((error) => console.log(error));
-}
+// function signInFacebook() {
+//     authStore.loginFacebook().catch((error) => console.log(error));
+// }
 
 function validate(values: any, { setErrors }: any) {
     
@@ -43,12 +43,12 @@ function validate(values: any, { setErrors }: any) {
                 <span class="d-sm-flex d-none mr-1">Sign in with</span>Google
             </v-btn>
         </v-col>
-        <v-col cols="6" sm="6" class="pl-2">
+        <!-- <v-col cols="6" sm="6" class="pl-2">
             <v-btn variant="text" size="large" class="border text-body-large" block @click="signInFacebook">
                 <img :src="facebook" width="25" height="25" class="mr-1" alt="facebook" />
                 <span class="d-sm-flex d-none mr-1">Sign in with</span>FB
             </v-btn>
-        </v-col>
+        </v-col> -->
     </v-row>
     <div class="d-flex align-center text-center mb-6">
         <div class="text-title-large w-100 px-5 font-weight-regular auth-divider position-relative">

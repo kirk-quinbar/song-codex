@@ -12,7 +12,7 @@ import { PowerIcon } from 'vue-tabler-icons';
 // import SidebarProfile from '../vertical-header/SidebarProfile.vue';
 const customizer = useCustomizerStore();
 const sidebarMenu = shallowRef(sidebarItems);
-const authStore = useAuthStore();
+// const authStore = useAuthStore();
 </script>
 
 <template>
@@ -31,18 +31,6 @@ const authStore = useAuthStore();
         <!---Navigation -->
         <!-- ---------------------------------------------- -->
         <perfect-scrollbar class="scrollnavbar">
-            <div class="profile">
-                <div class="profile-img py-10 px-3">
-                    <v-avatar variant="text" size="50">
-                        <img src="@/assets/images/profile/user-1.jpg" width="50" alt="Julia" />
-                    </v-avatar>
-                </div>
-                <!-- <div class="profile-name d-flex align-center px-3">
-                    <div class="profile-logout w-100">
-                        <SidebarProfile />
-                    </div>
-                </div> -->
-            </div>
             <v-list class="py-3 px-4">
                 <!---Menu Loop -->
                 <template v-for="(item, i) in sidebarMenu">

@@ -1,7 +1,46 @@
 <script setup lang="ts">
-import { profileDD } from '@/_mockApis/headerData';
+import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import user1 from '@/assets/images/profile/user-1.jpg'
+
 const authStore = useAuthStore();
+const authUser = authStore.user;
+const photoURL = ref(authUser?.photoURL || user1);
+
+export interface profileType {
+    title: string;
+    href: string;
+    badge: boolean;
+}
+
+const profileDD: profileType[] = [
+    // {
+    //     title: 'My Profile',
+    //     href: '/apps/user/profile',
+    //     badge: false
+    // },
+    // {
+    //     title: 'My Subscription',
+    //     href: '/pages/pricing',
+    //     badge: false
+    // },
+    // {
+    //     title: 'My Notes',
+    //     href: '/apps/notes',
+    //     badge: true
+    // },
+    {
+        title: 'Account Settings',
+        href: '/pages/account-settings',
+        badge: false
+    },
+    {
+        title: 'Sign Out',
+        href: '/auth/login2',
+        badge: false
+    }
+];
+
 </script>
 
 <template>
@@ -12,7 +51,7 @@ const authStore = useAuthStore();
         <template v-slot:activator="{ props }">
             <v-btn variant="text" v-bind="props" icon size="small" color="primary" class="custom-hover-primary ms-md-2">
                 <v-avatar variant="text" size="30">
-                    <img src="@/assets/images/profile/user-1.jpg" width="30" alt="user" />
+                    <img :src="photoURL" :alt="photoURL" />
                 </v-avatar>
             </v-btn>
         </template>
@@ -20,15 +59,15 @@ const authStore = useAuthStore();
             <div class="pb-4">
                 <div class="d-flex align-center pa-4">
                     <v-avatar variant="text" size="50">
-                        <img src="@/assets/images/profile/user-1.jpg" width="50" />
+                        <img :src="photoURL" :alt="photoURL" width="50" />
                     </v-avatar>
                     <div class="ml-3">
-                        <h6 class="text-title-large textPrimary font-weight-medium">Markarn Doe</h6>
-                        <span class="text-12 textSecondary">markrarn@wrappixel.com</span>
+                        <h6 class="text-title-large textPrimary font-weight-medium">{{ authUser?.displayName || 'Unknown' }}</h6>
+                        <span class="text-12 textSecondary">{{ authUser?.email || 'markrarn@wrappixel.com' }}</span>
                     </div>
                 </div>
                 <v-divider></v-divider>
-                <perfect-scrollbar style="height: calc(100vh - 240px); max-height: 240px">
+                <div style="height: 100px;">
                     <v-list class="py-0 px-4 theme-list mt-3" lines="one">
                         <v-list-item
                             v-for="item in profileDD"
@@ -43,7 +82,7 @@ const authStore = useAuthStore();
                             </div>
                         </v-list-item>
                     </v-list>
-                </perfect-scrollbar>
+                </div>
             </div>
         </v-sheet>
     </v-menu>

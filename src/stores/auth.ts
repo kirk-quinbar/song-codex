@@ -5,8 +5,10 @@ import { firebaseAuth } from '@/firebase/config'
 import {
     signInWithEmailAndPassword,
     signInWithPopup,
-    GoogleAuthProvider, 
-    FacebookAuthProvider
+    GoogleAuthProvider,
+    FacebookAuthProvider,
+    getAuth,
+    createUserWithEmailAndPassword
 } from 'firebase/auth'
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
@@ -24,24 +26,86 @@ export const useAuthStore = defineStore('auth', {
             provider.addScope('profile');
             provider.addScope('email');
 
-            return signInWithPopup(firebaseAuth, provider).then((result) => {
-                const user = result.user;
-                console.log('Google sign in successful:', user);
-                return user;
+            return await signInWithPopup(firebaseAuth, provider).then((result) => {
+                this.user = {
+                    uid: result.user.uid,
+                    displayName: result.user.displayName,
+                    email: result.user.email,
+                    photoURL: result.user.photoURL,
+                };
+
+                localStorage.setItem('user', JSON.stringify(this.user));
+                // redirect to previous url or default to home page
+                router.push(this.returnUrl || '/dashboards/general');
+
+                return this.user;
+            }
+            ).catch((error) => {
+                return error;
             });
         },
-        async loginFacebook() {
+        // async loginFacebook() {
+        //     const provider = new FacebookAuthProvider();
+        //     provider.addScope('public_profile');
+        //     provider.addScope('email');
+
+        //     return signInWithPopup(firebaseAuth, provider)
+        //         .then((result) => {
+        //             this.user = {
+        //                 uid: result.user.uid,
+        //                 displayName: result.user.displayName,
+        //                 email: result.user.email,
+        //                 photoURL: result.user.photoURL,
+        //             };
+
+        //             localStorage.setItem('user', JSON.stringify(this.user));
+        //             // redirect to previous url or default to home page
+        //             router.push(this.returnUrl || '/dashboards/general');
+
+        //             return this.user;
+        //         }
+        //         ).catch((error) => {
+        //             return error;
+        //         });
+
+        // },
+        async login(username: string, password: string) {
+            const auth = getAuth();
+            return await signInWithEmailAndPassword(auth, username, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    // update pinia state
+                    this.user = userCredential.user;
+                    // store user details and jwt in local storage to keep user logged in between page refreshes
+                    localStorage.setItem('user', JSON.stringify(this.user));
+                    // redirect to previous url or default to home page
+                    router.push(this.returnUrl || '/dashboards/general');
+                    return this.user;
+                })
+                .catch((error) => {
+                    return error;
+                });
 
         },
-        async login(username: string, password: string) {
-            const user = await fetchWrapper.post(`${baseUrl}/authenticate`, { username, password });
+        async register(username: string, password: string, displayName: string) {
+            const auth = getAuth();
+            return await createUserWithEmailAndPassword(auth, username, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    // update pinia state
+                    this.user = userCredential.user;
+                    //this.user.displayName = displayName;
+                    console.log('User registered:', this.user);
+                    // store user details and jwt in local storage to keep user logged in between page refreshes
+                    localStorage.setItem('user', JSON.stringify(this.user));
+                    // redirect to previous url or default to home page
+                    router.push(this.returnUrl || '/dashboards/general');
+                    return this.user;
+                })
+                .catch((error) => {
+                    return error;
+                });
 
-            // update pinia state
-            this.user = user;
-            // store user details and jwt in local storage to keep user logged in between page refreshes
-            localStorage.setItem('user', JSON.stringify(user));
-            // redirect to previous url or default to home page
-            router.push(this.returnUrl || '/dashboards/general');
         },
         logout() {
             this.user = null;
