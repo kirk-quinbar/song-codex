@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { router } from '@/router';
-import { fetchWrapper } from '@/utils/helpers/fetch-wrapper';
 import { firebaseAuth } from '@/firebase/config'
 import {
     signInWithEmailAndPassword,
@@ -10,6 +9,7 @@ import {
     getAuth,
     createUserWithEmailAndPassword
 } from 'firebase/auth'
+import { getUser, createUser, updateUser } from '@/data/userData'
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
 
@@ -26,7 +26,8 @@ export const useAuthStore = defineStore('auth', {
             provider.addScope('profile');
             provider.addScope('email');
 
-            return await signInWithPopup(firebaseAuth, provider).then((result) => {
+            try {
+                const result = await signInWithPopup(firebaseAuth, provider);
                 this.user = {
                     uid: result.user.uid,
                     displayName: result.user.displayName,
@@ -34,41 +35,19 @@ export const useAuthStore = defineStore('auth', {
                     photoURL: result.user.photoURL,
                 };
 
+                const user = await createUser(result.user.uid, result.user.displayName ?? '', result.user.email ?? '', result.user.photoURL ?? '');
+                console.log(user);
+
                 localStorage.setItem('user', JSON.stringify(this.user));
                 // redirect to previous url or default to home page
                 router.push(this.returnUrl || '/dashboards/general');
-
-                return this.user;
             }
-            ).catch((error) => {
-                return error;
-            });
+            catch (error) {
+                console.log(error)
+                return error
+            }
+
         },
-        // async loginFacebook() {
-        //     const provider = new FacebookAuthProvider();
-        //     provider.addScope('public_profile');
-        //     provider.addScope('email');
-
-        //     return signInWithPopup(firebaseAuth, provider)
-        //         .then((result) => {
-        //             this.user = {
-        //                 uid: result.user.uid,
-        //                 displayName: result.user.displayName,
-        //                 email: result.user.email,
-        //                 photoURL: result.user.photoURL,
-        //             };
-
-        //             localStorage.setItem('user', JSON.stringify(this.user));
-        //             // redirect to previous url or default to home page
-        //             router.push(this.returnUrl || '/dashboards/general');
-
-        //             return this.user;
-        //         }
-        //         ).catch((error) => {
-        //             return error;
-        //         });
-
-        // },
         async login(username: string, password: string) {
             const auth = getAuth();
             return await signInWithEmailAndPassword(auth, username, password)

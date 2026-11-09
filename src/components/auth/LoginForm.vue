@@ -8,7 +8,7 @@ import google from '@/assets/images/svgs/google-icon.svg';
 import facebook from '@/assets/images/svgs/facebook-icon.svg';
 
 const authStore = useAuthStore();
-authStore.logout();
+authStore.logout(); //remove user cookie upon load
 
 const checkbox = ref(false);
 const valid = ref(false);
@@ -22,7 +22,8 @@ const passwordRules = ref([
 const emailRules = ref([(v: string) => !!v || 'E-mail is required', (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid']);
 
 function signInGoogle() {
-    authStore.loginGoogle().catch((error) => console.log(error));
+    authStore.loginGoogle()
+    .catch((error) => console.log(error));
 }
     
 // function signInFacebook() {
@@ -31,7 +32,8 @@ function signInGoogle() {
 
 function validate(values: any, { setErrors }: any) {
     
-    return authStore.login(username.value, password.value).catch((error) => setErrors({ apiError: error }));
+    authStore.login(username.value, password.value)
+    .catch((error) => setErrors({ apiError: error }));
 }
 </script>
 
