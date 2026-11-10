@@ -30,7 +30,7 @@ function serializeUser(user: PartialWithFieldValue<User>) {
     if (user.uid !== undefined) record.uid = user.uid
     if (user.email !== undefined) record.email = user.email
     if (user.displayName !== undefined) record.displayName = user.displayName
-    if (user.profileUrl !== undefined) record.photoUrl = user.photoUrl
+    if (user.photoUrl !== undefined) record.photoUrl = user.photoUrl
     return record
 }
 

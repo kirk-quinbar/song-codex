@@ -5,7 +5,7 @@ import user1 from '@/assets/images/profile/user-1.jpg'
 
 const authStore = useAuthStore();
 const authUser = authStore.user;
-const photoURL = ref(authUser?.photoURL || user1);
+const photoUrl = ref(authUser?.photoUrl || user1);
 
 export interface profileType {
     title: string;
@@ -51,7 +51,7 @@ const profileDD: profileType[] = [
         <template v-slot:activator="{ props }">
             <v-btn variant="text" v-bind="props" icon size="small" color="primary" class="custom-hover-primary ms-md-2">
                 <v-avatar variant="text" size="30">
-                    <img :src="photoURL" :alt="photoURL" />
+                    <img :src="photoUrl" :alt="photoUrl" />
                 </v-avatar>
             </v-btn>
         </template>
@@ -59,7 +59,7 @@ const profileDD: profileType[] = [
             <div class="pb-4">
                 <div class="d-flex align-center pa-4">
                     <v-avatar variant="text" size="50">
-                        <img :src="photoURL" :alt="photoURL" width="50" />
+                        <img :src="photoUrl" :alt="photoUrl" width="50" />
                     </v-avatar>
                     <div class="ml-3">
                         <h6 class="text-title-large textPrimary font-weight-medium">{{ authUser?.displayName || 'Unknown' }}</h6>

@@ -28,15 +28,11 @@ export const useAuthStore = defineStore('auth', {
 
             try {
                 const result = await signInWithPopup(firebaseAuth, provider);
-                this.user = {
-                    uid: result.user.uid,
-                    displayName: result.user.displayName,
-                    email: result.user.email,
-                    photoURL: result.user.photoURL,
-                };
+
+                console.log('Google login result:', result);
 
                 const user = await createUser(result.user.uid, result.user.displayName ?? '', result.user.email ?? '', result.user.photoURL ?? '');
-                console.log(user);
+                this.user = user;
 
                 localStorage.setItem('user', JSON.stringify(this.user));
                 // redirect to previous url or default to home page
@@ -50,40 +46,40 @@ export const useAuthStore = defineStore('auth', {
         },
         async login(username: string, password: string) {
             const auth = getAuth();
-            return await signInWithEmailAndPassword(auth, username, password)
-                .then((userCredential) => {
-                    // Signed in 
-                    // update pinia state
-                    this.user = userCredential.user;
-                    // store user details and jwt in local storage to keep user logged in between page refreshes
-                    localStorage.setItem('user', JSON.stringify(this.user));
-                    // redirect to previous url or default to home page
-                    router.push(this.returnUrl || '/dashboards/general');
-                    return this.user;
-                })
-                .catch((error) => {
-                    return error;
-                });
+            try {
+                const result = await signInWithEmailAndPassword(auth, username, password)
+                
+                const user = await getUser(result.user.uid);
+                this.user = user;
 
+                // store user details and jwt in local storage to keep user logged in between page refreshes
+                localStorage.setItem('user', JSON.stringify(this.user));
+                // redirect to previous url or default to home page
+                router.push(this.returnUrl || '/dashboards/general');
+            }
+            catch (error) {
+                console.log(error)
+                return error
+            }
         },
         async register(username: string, password: string, displayName: string) {
             const auth = getAuth();
-            return await createUserWithEmailAndPassword(auth, username, password)
-                .then((userCredential) => {
-                    // Signed in 
-                    // update pinia state
-                    this.user = userCredential.user;
-                    //this.user.displayName = displayName;
-                    console.log('User registered:', this.user);
-                    // store user details and jwt in local storage to keep user logged in between page refreshes
-                    localStorage.setItem('user', JSON.stringify(this.user));
-                    // redirect to previous url or default to home page
-                    router.push(this.returnUrl || '/dashboards/general');
-                    return this.user;
-                })
-                .catch((error) => {
-                    return error;
-                });
+
+            try {
+                const result = await createUserWithEmailAndPassword(auth, username, password)
+
+                const user = await getUser(result.user.uid);
+                this.user = user;
+
+                // store user details and jwt in local storage to keep user logged in between page refreshes
+                localStorage.setItem('user', JSON.stringify(this.user));
+                // redirect to previous url or default to home page
+                router.push(this.returnUrl || '/dashboards/general');
+            }
+            catch (error) {
+                console.log(error)
+                return error
+            }
 
         },
         logout() {
