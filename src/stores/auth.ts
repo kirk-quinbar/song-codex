@@ -28,10 +28,8 @@ export const useAuthStore = defineStore('auth', {
 
             try {
                 const result = await signInWithPopup(firebaseAuth, provider);
-
-                console.log('Google login result:', result);
-
-                const user = await createUser(result.user.uid, result.user.displayName ?? '', result.user.email ?? '', result.user.photoURL ?? '');
+                console.log('signInWithPopup:', result);
+                const user = await createUser(result.user.uid, 'google', result.user.displayName ?? '', result.user.email ?? '', result.user.photoURL ?? '');
                 this.user = user;
 
                 localStorage.setItem('user', JSON.stringify(this.user));
@@ -39,7 +37,6 @@ export const useAuthStore = defineStore('auth', {
                 router.push(this.returnUrl || '/dashboards/general');
             }
             catch (error) {
-                console.log(error)
                 return error
             }
 
@@ -58,17 +55,18 @@ export const useAuthStore = defineStore('auth', {
                 router.push(this.returnUrl || '/dashboards/general');
             }
             catch (error) {
-                console.log(error)
                 return error
             }
         },
-        async register(username: string, password: string, displayName: string) {
+        async register(email: string, password: string, displayName: string) {
             const auth = getAuth();
 
             try {
-                const result = await createUserWithEmailAndPassword(auth, username, password)
+                const result = await createUserWithEmailAndPassword(auth, email, password)
 
-                const user = await getUser(result.user.uid);
+                console.log('createUserWithEmailAndPassword:', result);
+                
+                const user = await createUser(result.user.uid, 'email', displayName, email, '');
                 this.user = user;
 
                 // store user details and jwt in local storage to keep user logged in between page refreshes
@@ -77,7 +75,6 @@ export const useAuthStore = defineStore('auth', {
                 router.push(this.returnUrl || '/dashboards/general');
             }
             catch (error) {
-                console.log(error)
                 return error
             }
 

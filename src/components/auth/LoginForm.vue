@@ -12,7 +12,7 @@ authStore.logout(); //remove user cookie upon load
 
 const checkbox = ref(false);
 const valid = ref(false);
-const show1 = ref(false);
+const isSubmitting = ref(false);
 const password = ref('');
 const username = ref('');
 const passwordRules = ref([
@@ -32,25 +32,24 @@ function signInGoogle() {
 
 function validate(values: any, { setErrors }: any) {
     
-    authStore.login(username.value, password.value)
-    .catch((error) => setErrors({ apiError: error }));
+    isSubmitting.value = true;
+    authStore.login(username.value, password.value).then((result) => {
+        isSubmitting.value = false;
+        const apiError = typeof result === 'object' && result !== null && 'code' in result ? result.code : result;
+        setErrors({ apiError: String(apiError) });
+    })
+    //.catch((error) => setErrors({ apiError: error }));
 }
 </script>
 
 <template>
     <v-row class="d-flex mb-5" no-gutters>
-        <v-col cols="6" sm="6" class="pr-2">
+        <v-col >
             <v-btn variant="text" size="large" class="border text-body-large" block @click="signInGoogle">
                 <img :src="google" height="16" class="mr-2" alt="google" />
                 <span class="d-sm-flex d-none mr-1">Sign in with</span>Google
             </v-btn>
         </v-col>
-        <!-- <v-col cols="6" sm="6" class="pl-2">
-            <v-btn variant="text" size="large" class="border text-body-large" block @click="signInFacebook">
-                <img :src="facebook" width="25" height="25" class="mr-1" alt="facebook" />
-                <span class="d-sm-flex d-none mr-1">Sign in with</span>FB
-            </v-btn>
-        </v-col> -->
     </v-row>
     <div class="d-flex align-center text-center mb-6">
         <div class="text-title-large w-100 px-5 font-weight-regular auth-divider position-relative">
@@ -78,9 +77,9 @@ function validate(values: any, { setErrors }: any) {
                 >
             </div>
         </div>
-        <v-btn size="large" :loading="isSubmitting" color="primary" :disabled="valid" block type="submit" flat>Sign In</v-btn>
+        <v-btn size="large" :loading="isSubmitting" color="primary" :disabled="valid" block type="submit" >Sign In</v-btn>
         <div v-if="errors.apiError" class="mt-2">
-            <v-alert color="error">{{ errors.apiError }}</v-alert>
+            <v-alert  color="error">{{ errors.apiError }}</v-alert>
         </div>
     </Form>
 </template>

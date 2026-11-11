@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import logo from '@/assets/images/logos/song_codex_logo_white.jpg';
+import logo from '@/assets/images/logos/song_codex_logo_small_white.jpg';
 </script>
 <template>
     <div class="logo">
