@@ -120,7 +120,7 @@ async function createOrGetUser(uid: string, providerId: string, displayName: str
     const userCollection = collection(firebaseDb, 'user').withConverter(userConverter)
 
     const existingUser = await getUser(uid)
-    if (!existingUser) {
+    if (existingUser.hasError) {
         const newUser: UserRecord = {
             uid: uid,
             providerId: providerId,

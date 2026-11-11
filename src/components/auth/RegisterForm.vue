@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import Logo from '@/layouts/full/logo/Logo.vue';
-/*Social icons*/
-import google from '@/assets/images/svgs/google-icon.svg';
-import facebook from '@/assets/images/svgs/facebook-icon.svg';
 import { useAuthStore } from '@/stores/auth';
 
 const authStore = useAuthStore();
-const checkbox = ref(false);
-const valid = ref(true);
-const show1 = ref(false);
+const formRef = ref();
 const password = ref('');
 const email = ref('');
+const apiError = ref('');
+const loading = ref(false);
+
 const passwordRules = ref([
     (v: string) => !!v || 'Password is required',
     (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters'
@@ -23,27 +20,32 @@ const displayNameRules = ref([
     (v: string) => (v && v.length <= 100) || 'Display Name must be less than 100 characters'
 ]);
 
-function validate() {
-    return authStore.register(email.value, password.value, displayName.value);
+async function submit() {
+    apiError.value = ''
+
+    const formResult = await formRef.value.validate()
+
+    if (!formResult.valid) {
+        return
+    }
+
+    loading.value = true;
+    const result = await authStore.register(email.value, password.value, displayName.value);
+
+    loading.value = false;
+    apiError.value = result;
 }
 
 </script>
 <template>
-    <v-form ref="form" v-model="valid" lazy-validation action="/pages/boxedlogin" class="mt-5" @submit.prevent="validate">
+    <v-form ref="formRef" class="mt-5" @submit.prevent="submit">
         <v-label class="text-body-large font-weight-medium pb-2">Display Name</v-label>
-        <VTextField v-model="displayName" :rules="displayNameRules" required></VTextField>
+        <v-text-field v-model="displayName" :rules="displayNameRules" required></v-text-field>
         <v-label class="text-body-large font-weight-medium pb-2">Email Address</v-label>
-        <VTextField v-model="email" :rules="emailRules" required></VTextField>
+        <v-text-field v-model="email" :rules="emailRules" required></v-text-field>
         <v-label class="text-body-large font-weight-medium pb-2">Password</v-label>
-        <VTextField
-            v-model="password"
-            :counter="10"
-            :rules="passwordRules"
-            required
-            variant="outlined"
-            type="password"
-            color="primary"
-        ></VTextField>
-        <v-btn size="large" class="mt-2" color="primary" block type="submit" >Sign Up</v-btn>
+        <v-text-field v-model="password" :rules="passwordRules" type="password" class="pwdInput"></v-text-field>
+        <v-btn size="large" class="mt-2" color="primary" block type="submit">Sign Up</v-btn>
+        <v-alert v-if="apiError" type="error" variant="tonal" class="mb-4">{{ apiError }}</v-alert>
     </v-form>
 </template>

@@ -15,28 +15,32 @@ const password = ref('');
 const username = ref('');
 const passwordRules = ref([
     (v: string) => !!v || 'Password is required',
-    (v: string) => (v && v.length >= 8) || 'Password must be greater than 8 characters'
-]);
+    (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters']);
 const emailRules = ref([(v: string) => !!v || 'E-mail is required', (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid']);
 
 async function signInGoogle() {
     loading.value = true;
     const result = await authStore.loginGoogle()
 
-        loading.value = false;
-        apiError.value = result.code ?? result;
-        console.log('signInGoogle:', apiError);
-    
+    loading.value = false;
+    apiError.value = result;
 }
     
 async function submit() {
-    
+    apiError.value = ''
+
+    const formResult = await formRef.value.validate()
+
+    if (!formResult.valid) {
+        return
+    }
+
     loading.value = true;
-    authStore.login(username.value, password.value).then((result) => {
-        loading.value = false;
-        const apiError = typeof result === 'object' && result !== null && 'code' in result ? result.code : result;
-        
-    })
+    const result = await authStore.login(username.value, password.value)
+    
+    loading.value = false;
+    apiError.value = result;
+    
 }
 </script>
 
@@ -54,7 +58,7 @@ async function submit() {
             <span class="bg-surface px-5 py-3 position-relative">or sign in with</span>
         </div>
     </div>
-    <v-form ref="formRef" class="mt-5">
+    <v-form ref="formRef" class="mt-5" @submit.prevent="submit">
         <v-label class="text-body-large font-weight-medium pb-2 text-lightText">Username</v-label>
         <v-text-field v-model="username" :rules="emailRules" class="mb-8" ></v-text-field>
         <v-label class="text-body-large font-weight-medium pb-2 text-lightText">Password</v-label>
@@ -66,7 +70,7 @@ async function submit() {
                 >
             </div>
         </div>
-        <v-btn size="large" :loading="loading" color="primary" :disabled="valid" block type="submit" >Sign In</v-btn>
+        <v-btn size="large" :loading="loading" color="primary" block type="submit" >Sign In</v-btn>
         <v-alert v-if="apiError" type="error" variant="tonal" class="mb-4">{{ apiError }}</v-alert>
     </v-form>
 </template>

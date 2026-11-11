@@ -98,13 +98,18 @@ export const useAuthStore = defineStore('auth', {
                     switch ((error as { code: string }).code) {
                         case 'auth/invalid-credential':
                             return 'Invalid email or password.'
-
+                        case 'auth/invalid-email':
+                            return 'The email address is not valid. Please enter a valid email address.'
+                        case 'auth/missing-password':
+                            return 'The password is missing. Please enter your password.'
                         case 'auth/user-disabled':
                             return 'This account has been disabled.'
-
                         case 'auth/too-many-requests':
                             return 'Too many login attempts. Try again later.'
-
+                        case 'auth/user-disabled':
+                            return 'This account has been disabled.'
+                        case 'auth/too-many-requests':
+                            return 'Too many login attempts. Try again later.'
                         case 'auth/network-request-failed':
                             return 'Network error. Please check your connection.'
 
@@ -142,17 +147,16 @@ export const useAuthStore = defineStore('auth', {
                     'code' in error
                 ) {
                     switch ((error as { code: string }).code) {
-                        case 'auth/invalid-credential':
-                            return 'Invalid email or password.'
-
-                        case 'auth/user-disabled':
-                            return 'This account has been disabled.'
-
-                        case 'auth/too-many-requests':
-                            return 'Too many login attempts. Try again later.'
-
-                        case 'auth/network-request-failed':
-                            return 'Network error. Please check your connection.'
+                        case 'auth/email-already-in-use':
+                            return 'An account with this email address already exists.'
+                        case 'auth/weak-password':
+                            return 'The password is too weak. Please choose a stronger password.'
+                        case 'auth/password-does-not-meet-requirements':
+                            return 'The password does not meet the requirements. Please choose a stronger password.'
+                        case 'auth/invalid-email':
+                            return 'The email address is not valid. Please enter a valid email address.'
+                        case 'auth/operation-not-allowed':
+                            return 'Email/password accounts are not enabled. Please contact support.'
 
                         default:
                             return 'An unexpected authentication error occurred.'
@@ -160,8 +164,6 @@ export const useAuthStore = defineStore('auth', {
                 }
 
                 return 'An unexpected error occurred.'
-
-
             }
         },
         logout() {
