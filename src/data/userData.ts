@@ -54,7 +54,18 @@ class User {
         public photoUrl: string,
         public createdDate: Date,
         public lastModifiedDate: Date
-    ) {
+    ) 
+    {
+    }
+}
+
+class apiResult<T> {
+    constructor(
+        public hasError: boolean = false,
+        public errorMessage: string,
+        public data: T | null
+    )
+    {
     }
 }
 
@@ -66,21 +77,21 @@ const userConverter: FirestoreDataConverter<User, UserRecord> = {
     },
 }
 
-async function getUser(uid: string) {
+async function getUser(uid: string): Promise<apiResult<User>> {
     const userCollection = collection(firebaseDb, 'user')
 
     const userQuery = query(userCollection, where('uid', '==', uid), limit(1)).withConverter(userConverter)
     const querySnapshot = await getDocs(userQuery)
 
     if (querySnapshot.docs.length > 0) {
-        return querySnapshot.docs[0].data()
+        return new apiResult<User>(false, '', querySnapshot.docs[0].data())
     }
     else {
-        return null
+        return new apiResult<User>(true, 'User not found', null)
     }
 }
 
-async function updateUser(uid: string, providerId: string, displayName: string, email: string, photoUrl: string) {
+async function updateUser(uid: string, providerId: string, displayName: string, email: string, photoUrl: string): Promise<apiResult<User>> {
     const userCollection = collection(firebaseDb, 'user')
 
     const userQuery = query(userCollection, where('uid', '==', uid), limit(1)).withConverter(userConverter)
@@ -96,10 +107,16 @@ async function updateUser(uid: string, providerId: string, displayName: string, 
             createdDate: existingUser.data().createdDate,
             lastModifiedDate: new Date()
         })
+
+        const updatedUser = await getUser(uid);
+
+        return new apiResult<User>(false, '', updatedUser.data)   }
+    else {
+        return new apiResult<User>(true, 'User not found', null)
     }
 }
 
-async function createUser(uid: string, providerId: string, displayName: string, email: string, photoUrl: string) {
+async function createOrGetUser(uid: string, providerId: string, displayName: string, email: string, photoUrl: string): Promise<apiResult<User>> {
     const userCollection = collection(firebaseDb, 'user').withConverter(userConverter)
 
     const existingUser = await getUser(uid)
@@ -114,15 +131,16 @@ async function createUser(uid: string, providerId: string, displayName: string, 
             lastModifiedDate: new Date()
         }
         const userRef = await addDoc(userCollection, newUser)
-        const snap = await getDoc(userRef)
-        return snap.data() // User
+        
+        const updatedUser = await getUser(uid);
+        return new apiResult<User>(false, '', updatedUser.data)   
     }
     else {
-        return existingUser
+        return new apiResult<User>(false, 'User already exists', existingUser.data)
     }
 }
 
-async function deleteUser(uid: string) {
+async function deleteUser(uid: string): Promise<apiResult<string>> {
   const q = query(
     collection(firebaseDb, 'user'),
     where('uid', '==', uid)
@@ -133,11 +151,13 @@ async function deleteUser(uid: string) {
   for (const docSnap of snapshot.docs) {
     await deleteDoc(docSnap.ref)
   }
+
+  return new apiResult<string>(false, '', 'User deleted successfully')
 }
 
 export {
     getUser,
     updateUser,
-    createUser,
+    createOrGetUser,
     deleteUser
 }

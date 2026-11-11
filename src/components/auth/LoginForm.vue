@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { Form } from 'vee-validate';
 
 /*Social icons*/
 import google from '@/assets/images/svgs/google-icon.svg';
-import facebook from '@/assets/images/svgs/facebook-icon.svg';
 
 const authStore = useAuthStore();
 authStore.logout(); //remove user cookie upon load
 
-const checkbox = ref(false);
-const valid = ref(false);
-const isSubmitting = ref(false);
+const formRef = ref()
+const apiError = ref('');
+const loading = ref(false);
 const password = ref('');
 const username = ref('');
 const passwordRules = ref([
@@ -21,24 +19,24 @@ const passwordRules = ref([
 ]);
 const emailRules = ref([(v: string) => !!v || 'E-mail is required', (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid']);
 
-function signInGoogle() {
-    authStore.loginGoogle()
-    .catch((error) => console.log(error));
+async function signInGoogle() {
+    loading.value = true;
+    const result = await authStore.loginGoogle()
+
+        loading.value = false;
+        apiError.value = result.code ?? result;
+        console.log('signInGoogle:', apiError);
+    
 }
     
-// function signInFacebook() {
-//     authStore.loginFacebook().catch((error) => console.log(error));
-// }
-
-function validate(values: any, { setErrors }: any) {
+async function submit() {
     
-    isSubmitting.value = true;
+    loading.value = true;
     authStore.login(username.value, password.value).then((result) => {
-        isSubmitting.value = false;
+        loading.value = false;
         const apiError = typeof result === 'object' && result !== null && 'code' in result ? result.code : result;
-        setErrors({ apiError: String(apiError) });
+        
     })
-    //.catch((error) => setErrors({ apiError: error }));
 }
 </script>
 
@@ -56,30 +54,19 @@ function validate(values: any, { setErrors }: any) {
             <span class="bg-surface px-5 py-3 position-relative">or sign in with</span>
         </div>
     </div>
-    <Form @submit="validate" v-slot="{ errors, isSubmitting }" class="mt-5">
+    <v-form ref="formRef" class="mt-5">
         <v-label class="text-body-large font-weight-medium pb-2 text-lightText">Username</v-label>
-        <VTextField v-model="username" :rules="emailRules" class="mb-8" required hide-details="auto"></VTextField>
+        <v-text-field v-model="username" :rules="emailRules" class="mb-8" ></v-text-field>
         <v-label class="text-body-large font-weight-medium pb-2 text-lightText">Password</v-label>
-        <VTextField v-model="password" :rules="passwordRules" required hide-details="auto" type="password" class="pwdInput"></VTextField>
+        <v-text-field v-model="password" :rules="passwordRules" type="password" class="pwdInput"></v-text-field>
         <div class="d-flex flex-wrap align-center my-3 ml-n2">
-            <v-checkbox
-                v-model="checkbox"
-                :rules="[(v: any) => !!v || 'You must agree to continue!']"
-                required
-                hide-details
-                color="primary"
-            >
-                <template v-slot:label class="font-weight-medium">Remember this Device</template>
-            </v-checkbox>
             <div class="ml-sm-auto">
                 <RouterLink to="/auth/forgot-password2" class="text-primary text-decoration-none text-body-large opacity-1 font-weight-medium"
                     >Forgot Password ?</RouterLink
                 >
             </div>
         </div>
-        <v-btn size="large" :loading="isSubmitting" color="primary" :disabled="valid" block type="submit" >Sign In</v-btn>
-        <div v-if="errors.apiError" class="mt-2">
-            <v-alert  color="error">{{ errors.apiError }}</v-alert>
-        </div>
-    </Form>
+        <v-btn size="large" :loading="loading" color="primary" :disabled="valid" block type="submit" >Sign In</v-btn>
+        <v-alert v-if="apiError" type="error" variant="tonal" class="mb-4">{{ apiError }}</v-alert>
+    </v-form>
 </template>

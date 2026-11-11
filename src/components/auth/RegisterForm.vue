@@ -44,6 +44,6 @@ function validate() {
             type="password"
             color="primary"
         ></VTextField>
-        <v-btn size="large" class="mt-2" color="primary" block type="submit" flat>Sign Up</v-btn>
+        <v-btn size="large" class="mt-2" color="primary" block type="submit" >Sign Up</v-btn>
     </v-form>
 </template>
