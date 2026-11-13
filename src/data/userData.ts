@@ -77,6 +77,20 @@ const userConverter: FirestoreDataConverter<User, UserRecord> = {
     },
 }
 
+async function getUserByEmail(email: string): Promise<apiResult<User>> {
+    const userCollection = collection(firebaseDb, 'user')
+
+    const userQuery = query(userCollection, where('email', '==', email), limit(1)).withConverter(userConverter)
+    const querySnapshot = await getDocs(userQuery)
+
+    if (querySnapshot.docs.length > 0) {
+        return new apiResult<User>(false, '', querySnapshot.docs[0].data())
+    }
+    else {
+        return new apiResult<User>(true, 'User not found', null)
+    }
+}
+
 async function getUser(uid: string): Promise<apiResult<User>> {
     const userCollection = collection(firebaseDb, 'user')
 
@@ -157,6 +171,7 @@ async function deleteUser(uid: string): Promise<apiResult<string>> {
 
 export {
     getUser,
+    getUserByEmail,
     updateUser,
     createOrGetUser,
     deleteUser

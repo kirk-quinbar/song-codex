@@ -5,11 +5,11 @@ import {
     signInWithEmailAndPassword,
     signInWithPopup,
     GoogleAuthProvider,
-    FacebookAuthProvider,
+    sendPasswordResetEmail,
     getAuth,
     createUserWithEmailAndPassword
 } from 'firebase/auth'
-import { getUser, createOrGetUser } from '@/data/userData'
+import { getUser, createOrGetUser, getUserByEmail } from '@/data/userData'
 import {
     type AuthError
 } from 'firebase/auth'
@@ -76,6 +76,11 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const result = await signInWithEmailAndPassword(auth, username, password)
 
+                // await result.user.reload();
+                // if (!result.user.emailVerified) {
+                //     return 'Please verify your email address.';
+                // }
+
                 const createResult = await getUser(result.user.uid);
                 if (createResult.hasError) {
                     return createResult.errorMessage;
@@ -126,11 +131,13 @@ export const useAuthStore = defineStore('auth', {
 
             try {
                 const result = await createUserWithEmailAndPassword(auth, email, password)
+                //await sendEmailVerification(result.user);
 
                 const createResult = await createOrGetUser(result.user.uid, 'email', displayName, email, '');
                 if (createResult.hasError) {
                     return createResult.errorMessage;
                 }
+                
                 this.user = createResult.data;
 
                 // store user details and jwt in local storage to keep user logged in between page refreshes
@@ -166,6 +173,47 @@ export const useAuthStore = defineStore('auth', {
                 return 'An unexpected error occurred.'
             }
         },
+        async sendPasswordResetEmail(email: string): Promise<string> {
+            const auth = getAuth();
+
+            try {
+                const userResult = await getUserByEmail(email);
+                if (userResult.hasError) {
+                    return 'No user found with this email address.';
+                }
+                if (userResult.data?.providerId !== 'email') {
+                    return 'Password reset is only available for email/password accounts.';
+                }
+
+                const result = await sendPasswordResetEmail(auth, email);
+                
+                return 'Email sent. Please check your inbox for further instructions.';
+
+            } catch (error: unknown) {
+
+                if (
+                    typeof error === 'object' &&
+                    error !== null &&
+                    'code' in error
+                ) {
+                    switch ((error as { code: string }).code) {
+                        case 'auth/invalid-email':
+                            return 'The email address is not valid. Please enter a valid email address.'
+                        case 'auth/missing-email':
+                            return 'The email address is missing. Please enter a valid email address.'
+                        case 'auth/user-not-found':
+                            return 'No user found with this email address.'
+                        case 'auth/user-disabled':
+                            return 'The user account is disabled.'
+
+                        default:
+                            return 'An unexpected authentication error occurred.'
+                    }
+                }
+
+                return 'An unexpected error occurred.'
+            }
+        },        
         logout() {
             this.user = null;
             localStorage.removeItem('user');
