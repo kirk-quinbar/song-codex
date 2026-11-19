@@ -8,7 +8,7 @@ const MainRoutes = {
     children: [
         {
             path: '/',
-            redirect: '/dashboards/general'
+            redirect: '/create/idea'
         },
         {
             name: 'General',
@@ -172,6 +172,11 @@ const MainRoutes = {
             name: 'FAQ',
             path: '/pages/faq',
             component: () => import('@/views/pages/faq/Faq.vue')
+        },
+        {
+            name: 'FAQ',
+            path: '/resources/faq',
+            component: () => import('@/views/resources/Faq.vue')
         },
         {
             name: 'Alert',
@@ -423,6 +428,31 @@ const MainRoutes = {
             name: 'Editable Table',
             path: '/tables/editable',
             component: () => import('@/views/tables/TableEditable.vue')
+        },
+        {
+            name: 'Idea',
+            path: '/create/idea',
+            component: () => import('@/views/create/IdeaEditor.vue')
+        },
+        {
+            name: 'Artist',
+            path: '/create/artist',
+            component: () => import('@/views/create/ArtistEditor.vue')
+        },
+        {
+            name: 'Album',
+            path: '/create/album',
+            component: () => import('@/views/create/AlbumEditor.vue')
+        },
+        {
+            name: 'Song',
+            path: '/create/song',
+            component: () => import('@/views/create/SongEditor.vue')
+        },
+        {
+            name: 'Songs',
+            path: '/create/songs',
+            component: () => import('@/views/create/SongEditor.vue')
         },
         {
             name: 'Basic Data Table',

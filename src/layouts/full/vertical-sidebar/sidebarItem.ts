@@ -15,42 +15,37 @@ export interface menu {
 }
 
 const sidebarItem: menu[] = [
-    { header: 'Editors' },
+    { header: 'Create' },
     {
-        title: 'Ideas',
-        icon: 'screencast-2-linear',
-        to: '/dashboards/ideas'
+        title: 'Idea',
+        icon: 'lightbulb-linear',
+        to: '/create/idea'
     },
     {
-        title: 'Artists',
-        icon: 'screencast-2-linear',
-        to: '/dashboards/artists'
+        title: 'Artist',
+        icon: 'paint-brush-linear',
+        to: '/create/artist'
     },
     {
-        title: 'Albums',
-        icon: 'screencast-2-linear',
-        to: '/dashboards/albums'
+        title: 'Album',
+        icon: 'album-linear',
+        to: '/create/album'
     },
     {
-        title: 'Songs',
-        icon: 'screencast-2-linear',
-        to: '/dashboards/songs'
+        title: 'Song',
+        icon: 'notes-linear',
+        to: '/create/song'
     },
-    { header: 'Other' },
+    { header: 'Resources' },
     {
-        title: 'Help',
+        title: 'FAQ',
         icon: 'question-circle-linear',
-        to: '/dashboards/help'
+        to: '/resources/faq'
     },
     {
         title: 'Contact Us',
         icon: 'letter-linear',
-        to: '/dashboards/contact'
-    },
-    {
-        title: 'Sign Out',
-        icon: 'logout-2-linear',
-        to: '/auth/login2'
+        to: '/resources/contactus'
     },
 
 

@@ -9,11 +9,11 @@ const customizer = useCustomizerStore();
 // template skin color options
 const themeColors = ref([
     {
-        name: 'BLUE_THEME',
+        name: 'PURPLE_THEME',
         bg: 'togglethemeBlue'
     },
     {
-        name: 'DARK_BLUE_THEME',
+        name: 'DARK_PURPLE_THEME',
         bg: 'togglethemeDarkBlue'
     }
 ]);
