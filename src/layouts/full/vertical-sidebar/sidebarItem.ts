@@ -15,6 +15,45 @@ export interface menu {
 }
 
 const sidebarItem: menu[] = [
+    { header: 'Editors' },
+    {
+        title: 'Ideas',
+        icon: 'screencast-2-linear',
+        to: '/dashboards/ideas'
+    },
+    {
+        title: 'Artists',
+        icon: 'screencast-2-linear',
+        to: '/dashboards/artists'
+    },
+    {
+        title: 'Albums',
+        icon: 'screencast-2-linear',
+        to: '/dashboards/albums'
+    },
+    {
+        title: 'Songs',
+        icon: 'screencast-2-linear',
+        to: '/dashboards/songs'
+    },
+    { header: 'Other' },
+    {
+        title: 'Help',
+        icon: 'question-circle-linear',
+        to: '/dashboards/help'
+    },
+    {
+        title: 'Contact Us',
+        icon: 'letter-linear',
+        to: '/dashboards/contact'
+    },
+    {
+        title: 'Sign Out',
+        icon: 'logout-2-linear',
+        to: '/auth/login2'
+    },
+
+
     { header: 'Personal' },
     {
         title: 'General',

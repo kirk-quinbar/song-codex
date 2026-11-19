@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { router } from '@/router';
-import { firebaseAuth } from '@/firebase/config'
+import { firebaseAuth, firebaseDb } from '@/firebase/config'
 import {
     signInWithEmailAndPassword,
     signInWithPopup,
@@ -9,12 +9,12 @@ import {
     getAuth,
     createUserWithEmailAndPassword
 } from 'firebase/auth'
-import { getUser, createOrGetUser, getUserByEmail } from '@/data/userData'
-import {
-    type AuthError
-} from 'firebase/auth'
+import { User, SongCodexData } from '@/data/SongCodexData'
 
-const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
+const userData = new SongCodexData<User>(
+    firebaseDb,
+    User
+)
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -32,11 +32,25 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const result = await signInWithPopup(firebaseAuth, provider);
 
-                const createResult = await createOrGetUser(result.user.uid, 'google', result.user.displayName ?? '', result.user.email ?? '', result.user.photoURL ?? '');
-                if (createResult.hasError) {
-                    return createResult.errorMessage;
+                const existingUser = await userData.search('uid', result.user.uid);
+                if (!existingUser) {
+                    const newUser = new User();
+                    newUser.uid = result.user.uid;
+                    newUser.providerId = 'google';
+                    newUser.email = result.user.email ?? '';
+                    newUser.displayName = result.user.displayName ?? '';
+                    newUser.photoUrl = result.user.photoURL ?? '';
+                    const newId = await userData.add(newUser);
+
+                    const createdUser = await userData.get(newId);
+                    if (!createdUser) {
+                        return 'Failed to create user. Please contact support.';
+                    }
+                    this.user = createdUser;
                 }
-                this.user = createResult.data;
+                else {
+                    this.user = existingUser;
+                }
 
                 localStorage.setItem('user', JSON.stringify(this.user));
                 // redirect to previous url or default to home page
@@ -76,16 +90,11 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const result = await signInWithEmailAndPassword(auth, username, password)
 
-                // await result.user.reload();
-                // if (!result.user.emailVerified) {
-                //     return 'Please verify your email address.';
-                // }
-
-                const createResult = await getUser(result.user.uid);
-                if (createResult.hasError) {
-                    return createResult.errorMessage;
+                const existingUser = await userData.search('uid', result.user.uid);
+                if (!existingUser) {
+                    return 'User Does not exist. Please contact support.';
                 }
-                this.user = createResult.data;
+                this.user = existingUser;
 
                 // store user details and jwt in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(this.user));
@@ -131,14 +140,26 @@ export const useAuthStore = defineStore('auth', {
 
             try {
                 const result = await createUserWithEmailAndPassword(auth, email, password)
-                //await sendEmailVerification(result.user);
 
-                const createResult = await createOrGetUser(result.user.uid, 'email', displayName, email, '');
-                if (createResult.hasError) {
-                    return createResult.errorMessage;
+                const existingUser = await userData.search('uid', result.user.uid);
+                if (!existingUser) {
+                    const newUser = new User();
+                    newUser.uid = result.user.uid;
+                    newUser.providerId = 'email';
+                    newUser.email = email ?? '';
+                    newUser.displayName = displayName ?? '';
+                    newUser.photoUrl = '';
+                    const newId = await userData.add(newUser);
+
+                    const createdUser = await userData.get(newId);
+                    if (!createdUser) {
+                        return 'Failed to create user. Please contact support.';
+                    }
+                    this.user = createdUser;
                 }
-                
-                this.user = createResult.data;
+                else {
+                    this.user = existingUser;
+                }
 
                 // store user details and jwt in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(this.user));
@@ -177,16 +198,16 @@ export const useAuthStore = defineStore('auth', {
             const auth = getAuth();
 
             try {
-                const userResult = await getUserByEmail(email);
-                if (userResult.hasError) {
+                const userResult = await userData.search('email', email);
+                if (!userResult) {
                     return 'No user found with this email address.';
                 }
-                if (userResult.data?.providerId !== 'email') {
+                if (userResult.providerId !== 'email') {
                     return 'Password reset is only available for email/password accounts.';
                 }
 
                 const result = await sendPasswordResetEmail(auth, email);
-                
+
                 return 'Email sent. Please check your inbox for further instructions.';
 
             } catch (error: unknown) {
@@ -213,7 +234,7 @@ export const useAuthStore = defineStore('auth', {
 
                 return 'An unexpected error occurred.'
             }
-        },        
+        },
         logout() {
             this.user = null;
             localStorage.removeItem('user');
